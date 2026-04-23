@@ -23,11 +23,15 @@ const Header = () => {
       <div className="bg-primary text-primary-foreground text-xs py-2 overflow-hidden">
         <div className="flex whitespace-nowrap animate-marquee">
           <span className="px-8">🚚 FRETE GRÁTIS acima de R$199</span>
-          <span className="px-8">🎟️ CUPOM <strong>GAB10</strong> para 10% OFF</span>
-          <span className="px-8">💳 PARCELE em até 12x sem juros</span>
-          <span className="px-8">⚡ Entrega expressa para todo o Brasil</span>
-          <span className="px-8">🚚 FRETE GRÁTIS acima de R$199</span>
-          <span className="px-8">🎟️ CUPOM <strong>GAB10</strong> para 10% OFF</span>
+          <span className="px-8">
+            🎟️ CUPOM <strong>GAB10</strong> para 10% OFF
+          </span>
+          <span className="px-8">💳 Aceitamos a ELI como pagamento</span>
+          <span className="px-8">⚡ Entrega expressa para a safada da ELI</span>
+          <span className="px-8">🚚 FRETE GRÁTIS se a ELI der</span>
+          <span className="px-8">
+            🎟️ CUPOM <strong>GAB10</strong> para 10% OFF
+          </span>
           <span className="px-8">💳 PARCELE em até 12x sem juros</span>
           <span className="px-8">⚡ Entrega expressa para todo o Brasil</span>
         </div>
@@ -49,7 +53,10 @@ const Header = () => {
             </div>
           </Link>
 
-          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xl items-center gap-3 bg-white/5 hover:bg-white/10 transition-colors rounded-xl px-4 h-11 border border-white/10">
+          <form
+            onSubmit={handleSearch}
+            className="hidden md:flex flex-1 max-w-xl items-center gap-3 bg-white/5 hover:bg-white/10 transition-colors rounded-xl px-4 h-11 border border-white/10"
+          >
             <Search className="w-4 h-4 text-white/50" />
             <input
               value={search}
@@ -61,28 +68,43 @@ const Header = () => {
 
           <div className="flex items-center gap-2 ml-auto">
             {isAdmin && (
-              <Link to="/admin" className="hidden md:flex items-center gap-2 px-3 h-10 rounded-xl bg-primary/20 border border-primary/40 text-primary-glow hover:bg-primary/30 transition-colors text-sm font-medium">
+              <Link
+                to="/admin"
+                className="hidden md:flex items-center gap-2 px-3 h-10 rounded-xl bg-primary/20 border border-primary/40 text-primary-glow hover:bg-primary/30 transition-colors text-sm font-medium"
+              >
                 <Shield className="w-4 h-4" />
                 Admin
               </Link>
             )}
             {user ? (
               <>
-                <Link to="/conta" className="hidden sm:flex items-center gap-2 px-3 h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm transition-colors">
+                <Link
+                  to="/conta"
+                  className="hidden sm:flex items-center gap-2 px-3 h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm transition-colors"
+                >
                   <User className="w-4 h-4" />
                   Conta
                 </Link>
-                <button onClick={signOut} className="hidden sm:flex items-center gap-1.5 px-3 h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm transition-colors">
+                <button
+                  onClick={signOut}
+                  className="hidden sm:flex items-center gap-1.5 px-3 h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm transition-colors"
+                >
                   <LogOut className="w-4 h-4" />
                 </button>
               </>
             ) : (
-              <Link to="/login" className="flex items-center gap-2 px-3 h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm transition-colors">
+              <Link
+                to="/login"
+                className="flex items-center gap-2 px-3 h-10 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm transition-colors"
+              >
                 <User className="w-4 h-4" />
                 Entrar
               </Link>
             )}
-            <Link to="/carrinho" className="relative flex items-center gap-2 px-4 h-10 rounded-xl gradient-primary text-white text-sm font-semibold shadow-glow hover:shadow-intense transition-all">
+            <Link
+              to="/carrinho"
+              className="relative flex items-center gap-2 px-4 h-10 rounded-xl gradient-primary text-white text-sm font-semibold shadow-glow hover:shadow-intense transition-all"
+            >
               <ShoppingCart className="w-4 h-4" />
               <span className="hidden sm:inline">Carrinho</span>
               {count > 0 && (
@@ -106,7 +128,9 @@ const Header = () => {
               onClick={() => setOpen(false)}
               className={({ isActive }) =>
                 `px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                  isActive ? "gradient-primary text-white shadow-glow" : "text-white/70 hover:text-white hover:bg-white/5"
+                  isActive
+                    ? "gradient-primary text-white shadow-glow"
+                    : "text-white/70 hover:text-white hover:bg-white/5"
                 }`
               }
             >
@@ -119,7 +143,9 @@ const Header = () => {
                 onClick={() => setOpen(false)}
                 className={({ isActive }) =>
                   `px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                    isActive ? "gradient-primary text-white shadow-glow" : "text-white/70 hover:text-white hover:bg-white/5"
+                    isActive
+                      ? "gradient-primary text-white shadow-glow"
+                      : "text-white/70 hover:text-white hover:bg-white/5"
                   }`
                 }
               >
@@ -131,7 +157,9 @@ const Header = () => {
               onClick={() => setOpen(false)}
               className={({ isActive }) =>
                 `px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                  isActive ? "gradient-primary text-white shadow-glow" : "text-white/70 hover:text-white hover:bg-white/5"
+                  isActive
+                    ? "gradient-primary text-white shadow-glow"
+                    : "text-white/70 hover:text-white hover:bg-white/5"
                 }`
               }
             >
@@ -142,7 +170,9 @@ const Header = () => {
               onClick={() => setOpen(false)}
               className={({ isActive }) =>
                 `px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                  isActive ? "gradient-primary text-white shadow-glow" : "text-white/70 hover:text-white hover:bg-white/5"
+                  isActive
+                    ? "gradient-primary text-white shadow-glow"
+                    : "text-white/70 hover:text-white hover:bg-white/5"
                 }`
               }
             >
