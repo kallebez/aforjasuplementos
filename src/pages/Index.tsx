@@ -67,7 +67,7 @@ const Index = () => {
               <img
                 src="https://storage.googleapis.com/nexapp-flutter.appspot.com/production/products/2015371e92e95b7b5859868de72797c0"
                 alt="Whey Protein Aforja"
-                className="relative w-full h-full object-contain animate-float drop-shadow-2xl"
+                className="relative w-full h-full object-contain animate-float drop-shadow-2xl rounded-3xl shadow-2xl"
               />
               <div className="absolute -top-4 -right-4 gradient-primary text-white rounded-2xl px-5 py-3 shadow-intense rotate-6 animate-fade-in delay-400">
                 <div className="text-[10px] tracking-widest opacity-80">A PARTIR DE</div>
