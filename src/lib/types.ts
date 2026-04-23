@@ -39,12 +39,9 @@ export type Order = {
 
 export const CATEGORIES = ["Whey Protein", "Creatina", "Pré-Treinos", "Vitaminas"] as const;
 
-export const COUPONS = [
-  { code: "GAB10", discount: 0.1, minTotal: 0, description: "10% OFF em todo pedido" },
-  { code: "FORJA15", discount: 0.15, minTotal: 150, description: "15% OFF acima de R$150" },
-  { code: "POWER20", discount: 0.2, minTotal: 250, description: "20% OFF acima de R$250" },
-  { code: "SAVE25", discount: 0.25, minTotal: 300, description: "25% OFF acima de R$300" },
-];
+// Coupon validation is performed server-side in the `checkout` Edge Function.
+// Codes and discount percentages are intentionally NOT shipped to the client.
+
 
 export const formatBRL = (n: number) =>
   n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
