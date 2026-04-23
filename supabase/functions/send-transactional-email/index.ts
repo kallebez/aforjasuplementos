@@ -30,9 +30,15 @@ function generateToken(): string {
     .join('')
 }
 
-// Auth note: this function uses verify_jwt = true in config.toml, so Supabase's
-// gateway validates the caller's JWT (anon or service_role) before the request
-// reaches this code. No in-function auth check is needed.
+// Authorization model:
+// - Templates whose `to` is set in the registry are server-managed and may
+//   only be invoked by the service role (e.g. from another Edge Function).
+// - All other templates may be invoked by an authenticated end user, but
+//   only to send to their OWN verified email address. This prevents the
+//   store's email infrastructure from being abused for phishing or spam.
+// - A simple per-user rate limit (max 5 sends / hour) is enforced via the
+//   email_send_log table. Service-role calls bypass these checks.
+const USER_RATE_LIMIT_PER_HOUR = 5
 
 Deno.serve(async (req) => {
   // Handle CORS preflight
@@ -42,6 +48,7 @@ Deno.serve(async (req) => {
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
   const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')
 
   if (!supabaseUrl || !supabaseServiceKey) {
     console.error('Missing required environment variables')
