@@ -1,32 +1,48 @@
 import Layout from "@/components/layout/Layout";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { formatBRL, COUPONS } from "@/lib/types";
+import { formatBRL } from "@/lib/types";
 import { Link, useNavigate } from "react-router-dom";
 import { Trash2, Plus, Minus, ShoppingBag, Tag } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+const SHIPPING_FEE = 19.9;
+const FREE_SHIPPING_THRESHOLD = 199;
+
 const Cart = () => {
   const { items, updateQty, removeItem, subtotal, clear } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [coupon, setCoupon] = useState<{ code: string; discount: number } | null>(null);
+  // Estimated discount returned by the server after applying a coupon.
+  const [couponPreview, setCouponPreview] = useState<{
+    code: string;
+    discount: number;
+    shipping: number;
+    total: number;
+  } | null>(null);
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const applyCoupon = () => {
-    const found = COUPONS.find((c) => c.code === code.trim().toUpperCase());
-    if (!found) return toast.error("Cupom inválido");
-    if (subtotal < found.minTotal) return toast.error(`Mínimo de ${formatBRL(found.minTotal)}`);
-    setCoupon(found);
-    toast.success(`Cupom ${found.code} aplicado!`);
-  };
+  // Client-side estimates for display only. The server is the source of truth
+  // and will recompute everything at checkout — these values are NEVER sent.
+  const estimatedDiscount = couponPreview?.discount ?? 0;
+  const estimatedShipping =
+    subtotal === 0 ? 0 : subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
+  const estimatedTotal = Math.max(0, subtotal - estimatedDiscount + estimatedShipping);
 
-  const discount = coupon ? subtotal * coupon.discount : 0;
-  const shipping = subtotal >= 199 || subtotal === 0 ? 0 : 19.9;
-  const total = subtotal - discount + shipping;
+  const applyCoupon = async () => {
+    const trimmed = code.trim().toUpperCase();
+    if (!trimmed) return;
+    if (!/^[A-Z0-9_-]{1,32}$/.test(trimmed)) {
+      return toast.error("Cupom inválido");
+    }
+    // Optimistic UI: just store the code; the server validates at checkout.
+    // We can't preview the discount without exposing coupon rules client-side.
+    setCouponPreview({ code: trimmed, discount: 0, shipping: estimatedShipping, total: estimatedTotal });
+    toast.success(`Cupom ${trimmed} será validado no checkout`);
+  };
 
   const handleCheckout = async () => {
     if (!user) {
@@ -35,88 +51,30 @@ const Cart = () => {
     }
     setLoading(true);
     try {
-      const customerName =
-        (user.user_metadata as any)?.full_name ||
-        (user.user_metadata as any)?.name ||
-        user.email?.split("@")[0] ||
-        "Cliente";
-
-      const { data: order, error } = await supabase
-        .from("orders")
-        .insert({
-          user_id: user.id,
-          status: "paid",
-          subtotal,
-          discount,
-          shipping,
-          total,
-          coupon_code: coupon?.code ?? null,
-          payment_method: "simulated",
-          customer_email: user.email,
-          customer_name: customerName,
-        })
-        .select()
-        .single();
-      if (error) throw error;
-
-      const itemsPayload = items.map((i) => ({
-        order_id: order.id,
-        product_id: i.product.id,
-        product_name: i.product.name,
-        product_image: i.product.image_url,
-        unit_price: i.product.price,
-        quantity: i.quantity,
-        subtotal: i.product.price * i.quantity,
-      }));
-      const { error: itemsErr } = await supabase.from("order_items").insert(itemsPayload);
-      if (itemsErr) throw itemsErr;
-
-      // Send email notifications (do not block checkout if email fails)
-      const emailItems = items.map((i) => ({
-        name: i.product.name,
-        quantity: i.quantity,
-        subtotal: i.product.price * i.quantity,
-      }));
-
-      const customerEmailPayload = {
-        templateName: "order-confirmation",
-        recipientEmail: user.email,
-        idempotencyKey: `order-confirm-${order.id}`,
-        templateData: {
-          customerName,
-          orderId: order.id,
-          items: emailItems,
-          subtotal,
-          discount,
-          shipping,
-          total,
-        },
+      const payload = {
+        items: items.map((i) => ({
+          product_id: i.product.id,
+          quantity: i.quantity,
+        })),
+        couponCode: couponPreview?.code ?? null,
       };
 
-      const adminEmailPayload = {
-        templateName: "admin-new-order",
-        recipientEmail: "gabrielbetiol2@gmail.com",
-        idempotencyKey: `order-admin-${order.id}`,
-        templateData: {
-          customerName,
-          customerEmail: user.email,
-          orderId: order.id,
-          items: emailItems,
-          subtotal,
-          discount,
-          shipping,
-          total,
-          couponCode: coupon?.code ?? null,
-        },
-      };
-
-      Promise.allSettled([
-        supabase.functions.invoke("send-transactional-email", { body: customerEmailPayload }),
-        supabase.functions.invoke("send-transactional-email", { body: adminEmailPayload }),
-      ]).catch((e) => console.error("Email dispatch error", e));
+      const { data, error } = await supabase.functions.invoke("checkout", { body: payload });
+      if (error) {
+        // Try to surface server's error message if available
+        const msg =
+          (data as any)?.error ||
+          (error as any)?.context?.error ||
+          error.message ||
+          "Erro ao finalizar a compra";
+        throw new Error(msg);
+      }
+      if (!data?.success) {
+        throw new Error((data as any)?.error || "Erro ao finalizar a compra");
+      }
 
       clear();
-      setCoupon(null);
+      setCouponPreview(null);
       toast.success("Pedido realizado! Enviamos a confirmação por email.");
       navigate("/conta");
     } catch (e: any) {
@@ -184,23 +142,24 @@ const Cart = () => {
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 placeholder="Cupom"
+                maxLength={32}
                 className="flex-1 bg-muted border border-border rounded-lg px-3 h-10 text-sm outline-none focus:border-primary"
               />
               <button onClick={applyCoupon} className="px-4 h-10 bg-secondary text-white rounded-lg text-sm font-semibold hover:bg-secondary/90">
                 <Tag className="w-4 h-4" />
               </button>
             </div>
-            {coupon && (
+            {couponPreview && (
               <div className="text-xs text-success bg-success/10 border border-success/20 rounded-lg p-2">
-                Cupom <strong>{coupon.code}</strong> aplicado
+                Cupom <strong>{couponPreview.code}</strong> será aplicado se válido
               </div>
             )}
 
             <div className="space-y-2 text-sm border-t border-border pt-4">
               <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>{formatBRL(subtotal)}</span></div>
-              {coupon && <div className="flex justify-between text-success"><span>Desconto</span><span>-{formatBRL(discount)}</span></div>}
-              <div className="flex justify-between"><span className="text-muted-foreground">Frete</span><span>{shipping === 0 ? "Grátis" : formatBRL(shipping)}</span></div>
-              <div className="flex justify-between text-lg font-bold pt-2 border-t border-border"><span>Total</span><span className="text-primary">{formatBRL(total)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Frete estimado</span><span>{estimatedShipping === 0 ? "Grátis" : formatBRL(estimatedShipping)}</span></div>
+              <div className="flex justify-between text-lg font-bold pt-2 border-t border-border"><span>Total estimado</span><span className="text-primary">{formatBRL(estimatedTotal)}</span></div>
+              <p className="text-[11px] text-muted-foreground">Cupom e total finais são calculados de forma segura no servidor.</p>
             </div>
 
             <button
