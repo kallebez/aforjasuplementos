@@ -127,8 +127,75 @@ Deno.serve(async (req) => {
     )
   }
 
+  // ── Authorization ──────────────────────────────────────────────────
+  // Determine whether the caller is the service role (trusted backend)
+  // or an end-user JWT. We inspect the bearer token directly because the
+  // function is deployed with verify_jwt=true; the gateway has already
+  // validated the signature.
+  const authHeader = req.headers.get('Authorization') || ''
+  const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : ''
+  let callerRole: 'service_role' | 'user' | 'anon' = 'anon'
+  let callerEmail: string | null = null
+  let callerUserId: string | null = null
+
+  if (bearer && bearer === supabaseServiceKey) {
+    callerRole = 'service_role'
+  } else if (bearer && supabaseAnonKey) {
+    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    })
+    const { data: u, error: uErr } = await userClient.auth.getUser()
+    if (uErr || !u?.user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+    callerRole = 'user'
+    callerEmail = u.user.email?.toLowerCase() ?? null
+    callerUserId = u.user.id
+  } else {
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized' }),
+      { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
+  }
+
+  // End users can only send to their own verified email address.
+  // Templates with a fixed `to` are server-managed and require service_role.
+  if (callerRole !== 'service_role') {
+    if (template.to) {
+      return new Response(
+        JSON.stringify({ error: 'Forbidden' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+    if (!callerEmail || effectiveRecipient.toLowerCase() !== callerEmail) {
+      return new Response(
+        JSON.stringify({ error: 'Forbidden' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+  }
+
   // Create Supabase client with service role (bypasses RLS)
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+  // Per-user rate limit (skip for service_role).
+  if (callerRole === 'user' && callerUserId) {
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString()
+    const { count } = await supabase
+      .from('email_send_log')
+      .select('id', { count: 'exact', head: true })
+      .eq('recipient_email', callerEmail!)
+      .gte('created_at', oneHourAgo)
+    if ((count ?? 0) >= USER_RATE_LIMIT_PER_HOUR) {
+      return new Response(
+        JSON.stringify({ error: 'Rate limit exceeded. Try again later.' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+  }
 
   // 2. Check suppression list (fail-closed: if we can't verify, don't send)
   const { data: suppressed, error: suppressionError } = await supabase
