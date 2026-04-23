@@ -35,6 +35,12 @@ const Cart = () => {
     }
     setLoading(true);
     try {
+      const customerName =
+        (user.user_metadata as any)?.full_name ||
+        (user.user_metadata as any)?.name ||
+        user.email?.split("@")[0] ||
+        "Cliente";
+
       const { data: order, error } = await supabase
         .from("orders")
         .insert({
@@ -47,6 +53,7 @@ const Cart = () => {
           coupon_code: coupon?.code ?? null,
           payment_method: "simulated",
           customer_email: user.email,
+          customer_name: customerName,
         })
         .select()
         .single();
@@ -64,9 +71,53 @@ const Cart = () => {
       const { error: itemsErr } = await supabase.from("order_items").insert(itemsPayload);
       if (itemsErr) throw itemsErr;
 
+      // Send email notifications (do not block checkout if email fails)
+      const emailItems = items.map((i) => ({
+        name: i.product.name,
+        quantity: i.quantity,
+        subtotal: i.product.price * i.quantity,
+      }));
+
+      const customerEmailPayload = {
+        templateName: "order-confirmation",
+        recipientEmail: user.email,
+        idempotencyKey: `order-confirm-${order.id}`,
+        templateData: {
+          customerName,
+          orderId: order.id,
+          items: emailItems,
+          subtotal,
+          discount,
+          shipping,
+          total,
+        },
+      };
+
+      const adminEmailPayload = {
+        templateName: "admin-new-order",
+        recipientEmail: "gabrielbetiol2@gmail.com",
+        idempotencyKey: `order-admin-${order.id}`,
+        templateData: {
+          customerName,
+          customerEmail: user.email,
+          orderId: order.id,
+          items: emailItems,
+          subtotal,
+          discount,
+          shipping,
+          total,
+          couponCode: coupon?.code ?? null,
+        },
+      };
+
+      Promise.allSettled([
+        supabase.functions.invoke("send-transactional-email", { body: customerEmailPayload }),
+        supabase.functions.invoke("send-transactional-email", { body: adminEmailPayload }),
+      ]).catch((e) => console.error("Email dispatch error", e));
+
       clear();
       setCoupon(null);
-      toast.success("Pedido realizado com sucesso!");
+      toast.success("Pedido realizado! Enviamos a confirmação por email.");
       navigate("/conta");
     } catch (e: any) {
       toast.error(e.message);
