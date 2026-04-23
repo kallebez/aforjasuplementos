@@ -34,7 +34,23 @@ const AdminOrders = () => {
 
       <div className="bg-card border border-border rounded-2xl overflow-hidden">
         {loading ? (
-          <div className="p-10 text-center text-muted-foreground">Carregando...</div>
+          <div className="divide-y divide-border">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-4 p-4">
+                <div className="w-4 h-4 rounded bg-muted animate-pulse" />
+                <div className="flex-1 grid grid-cols-2 md:grid-cols-5 gap-4">
+                  <div className="space-y-1.5">
+                    <div className="h-4 w-20 rounded bg-muted animate-pulse" />
+                    <div className="h-3 w-16 rounded bg-muted animate-pulse" />
+                  </div>
+                  <div className="h-4 w-32 rounded bg-muted animate-pulse" />
+                  <div className="h-5 w-20 rounded bg-muted animate-pulse" />
+                  <div className="h-4 w-12 rounded bg-muted animate-pulse" />
+                  <div className="h-8 w-24 rounded-lg bg-muted animate-pulse" />
+                </div>
+              </div>
+            ))}
+          </div>
         ) : orders.length === 0 ? (
           <div className="p-10 text-center text-muted-foreground">Nenhum pedido ainda</div>
         ) : (

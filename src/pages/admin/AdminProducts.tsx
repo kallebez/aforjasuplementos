@@ -144,7 +144,23 @@ const AdminProducts = () => {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} className="text-center p-10 text-muted-foreground">Carregando...</td></tr>
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className="border-t border-border">
+                    <td className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-lg bg-muted animate-pulse shrink-0" />
+                        <div className="h-4 w-48 rounded bg-muted animate-pulse" />
+                      </div>
+                    </td>
+                    <td className="p-4"><div className="h-4 w-20 rounded bg-muted animate-pulse" /></td>
+                    <td className="p-4"><div className="h-4 w-16 rounded bg-muted animate-pulse" /></td>
+                    <td className="p-4"><div className="h-4 w-10 rounded bg-muted animate-pulse" /></td>
+                    <td className="p-4"><div className="h-6 w-16 rounded-full bg-muted animate-pulse" /></td>
+                    <td className="p-4"><div className="h-9 w-20 rounded-lg bg-muted animate-pulse ml-auto" /></td>
+                  </tr>
+                ))
+              ) : products.length === 0 ? (
+                <tr><td colSpan={6} className="text-center p-10 text-muted-foreground">Nenhum produto cadastrado ainda</td></tr>
               ) : products.map((p) => (
                 <tr key={p.id} className="border-t border-border hover:bg-muted/40">
                   <td className="p-4">
