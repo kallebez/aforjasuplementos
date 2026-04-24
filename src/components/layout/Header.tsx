@@ -42,10 +42,13 @@ const Header = () => {
         <div className="container flex items-center gap-4 h-20">
           <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
             <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shadow-glow group-hover:scale-110 transition-transform">
-              <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" stroke="white" strokeWidth="1.8">
-                <path d="M12 2L3 7v10l9 5 9-5V7L12 2z" />
-                <path d="M12 8v8M8 10l4-2 4 2" />
-              </svg>
+              <img
+                src="/logo.png"
+                alt="Aforja"
+                className="w-7 h-7 object-contain drop-shadow-sm"
+                width={28}
+                height={28}
+              />
             </div>
             <div className="text-white leading-tight">
               <div className="font-display text-xl tracking-wider">AFORJA</div>
