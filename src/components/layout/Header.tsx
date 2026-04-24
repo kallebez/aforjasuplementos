@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import { CATEGORIES } from "@/lib/types";
 import { useState } from "react";
+import logo from "@/assets/logo.jpeg";
 
 const Header = () => {
   const { user, isAdmin, signOut } = useAuth();
@@ -40,20 +41,14 @@ const Header = () => {
       {/* Main */}
       <div className="glass-dark">
         <div className="container flex items-center gap-4 h-20">
-          <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
-            <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shadow-glow group-hover:scale-110 transition-transform">
-              <img
-                src="/logo.png"
-                alt="Aforja"
-                className="w-7 h-7 object-contain drop-shadow-sm"
-                width={28}
-                height={28}
-              />
-            </div>
-            <div className="text-white leading-tight">
-              <div className="font-display text-xl tracking-wider">AFORJA</div>
-              <div className="text-[9px] tracking-[0.2em] text-primary-glow font-semibold -mt-0.5">SUPLEMENTOS</div>
-            </div>
+          <Link to="/" className="flex items-center shrink-0 group">
+            <img
+              src={logo}
+              alt="Aforja Suplementos - Suplementando Guerreiros"
+              className="h-14 w-14 rounded-full object-cover shadow-glow group-hover:scale-110 transition-transform"
+              width={56}
+              height={56}
+            />
           </Link>
 
           <form
