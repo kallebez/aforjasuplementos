@@ -50,7 +50,7 @@ const ProductCard = ({ product, index = 0 }: { product: Product; index?: number 
           <span>({product.rating_count})</span>
         </div>
         <Link to={`/produto/${product.id}`}>
-          <h3 className="font-semibold text-sm leading-snug line-clamp-2 transition-colors min-h-[40px] text-primary bg-primary-foreground">
+          <h3 className="font-semibold text-sm leading-snug line-clamp-2 transition-colors min-h-[40px] bg-primary-foreground text-secondary">
             {product.name}
           </h3>
         </Link>
