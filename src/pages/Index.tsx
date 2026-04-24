@@ -56,7 +56,6 @@ const Index = () => {
             <div className="flex flex-wrap gap-6 pt-4 text-sm text-white/60">
               <span className="flex items-center gap-2"><Truck className="w-4 h-4 text-primary-glow" /> Entrega expressa</span>
               <span className="flex items-center gap-2"><Shield className="w-4 h-4 text-primary-glow" /> 100% Original</span>
-              <span className="flex items-center gap-2"><Award className="w-4 h-4 text-primary-glow" /> +50k clientes</span>
             </div>
           </div>
 
