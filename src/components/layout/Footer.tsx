@@ -22,8 +22,18 @@ const Footer = () => (
           Os melhores suplementos para forjar o atleta dentro de você. Qualidade, performance e entrega expressa.
         </p>
         <div className="flex gap-3 mt-5">
-          {[Instagram, Facebook, Youtube].map((Icon, i) => (
-            <a key={i} href="#" className="w-9 h-9 rounded-lg bg-white/5 hover:gradient-primary border border-white/10 flex items-center justify-center transition-all hover:scale-110">
+          {[
+            { Icon: Instagram, href: "https://www.instagram.com/aforjasuplementos/" },
+            { Icon: Facebook, href: "https://www.facebook.com/people/A-FORJA-Suplementos/61583735893021/" },
+            { Icon: Youtube, href: "#" },
+          ].map(({ Icon, href }, i) => (
+            <a
+              key={i}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-9 h-9 rounded-lg bg-white/5 hover:gradient-primary border border-white/10 flex items-center justify-center transition-all hover:scale-110"
+            >
               <Icon className="w-4 h-4" />
             </a>
           ))}
@@ -40,16 +50,26 @@ const Footer = () => (
               </Link>
             </li>
           ))}
-          <li><Link to="/combos" className="hover:text-white transition-colors">Combos</Link></li>
+          <li>
+            <Link to="/combos" className="hover:text-white transition-colors">
+              Combos
+            </Link>
+          </li>
         </ul>
       </div>
 
       <div>
         <h4 className="font-semibold mb-4 text-primary-glow">Atendimento</h4>
         <ul className="space-y-2 text-sm text-white/70">
-          <li className="flex items-center gap-2"><Phone className="w-4 h-4" /> (11) 99999-9999</li>
-          <li className="flex items-center gap-2"><Mail className="w-4 h-4" /> contato@aforja.com</li>
-          <li className="flex items-center gap-2"><MapPin className="w-4 h-4" /> São Paulo, SP</li>
+          <li className="flex items-center gap-2">
+            <Phone className="w-4 h-4" /> (11) 99999-9999
+          </li>
+          <li className="flex items-center gap-2">
+            <Mail className="w-4 h-4" /> contato@aforja.com
+          </li>
+          <li className="flex items-center gap-2">
+            <MapPin className="w-4 h-4" /> São Paulo, SP
+          </li>
         </ul>
       </div>
 
