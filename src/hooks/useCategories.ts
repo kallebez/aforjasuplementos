@@ -17,7 +17,7 @@ export const useCategories = (activeOnly = true) => {
       setLoading(false);
       return;
     }
-    setCategories((data ?? []) as Category[]);
+    setCategories((data ?? []) as unknown as Category[]);
     setError(null);
     setLoading(false);
   };
