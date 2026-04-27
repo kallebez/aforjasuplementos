@@ -1,6 +1,6 @@
 import { Navigate, NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Package, ShoppingBag, LogOut, Home, Shield } from "lucide-react";
+import { Package, ShoppingBag, LogOut, Home, Shield, Tags } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const AdminLayout = () => {
@@ -13,6 +13,7 @@ const AdminLayout = () => {
   const links = [
     { to: "/admin", label: "Dashboard", icon: Shield, end: true },
     { to: "/admin/produtos", label: "Produtos", icon: Package },
+    { to: "/admin/categorias", label: "Categorias", icon: Tags },
     { to: "/admin/pedidos", label: "Pedidos", icon: ShoppingBag },
   ];
 
