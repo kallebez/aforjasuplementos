@@ -27,13 +27,11 @@ const Header = () => {
           <span className="px-8">
             🎟️ CUPOM <strong>GAB10</strong> para 10% OFF
           </span>
-          <span className="px-8">💳 Aceitamos a ELI como pagamento</span>
-          <span className="px-8">⚡ Entrega expressa para a safada da ELI</span>
-          <span className="px-8">🚚 FRETE GRÁTIS se a ELI der</span>
+          <span className="px-8">⚡ Entrega expressa para todo o Brasil</span>
+          <span className="px-8">🚚 FRETE GRÁTIS acima de R$199</span>
           <span className="px-8">
             🎟️ CUPOM <strong>GAB10</strong> para 10% OFF
           </span>
-          <span className="px-8">💳 PARCELE em até 12x sem juros</span>
           <span className="px-8">⚡ Entrega expressa para todo o Brasil</span>
         </div>
       </div>
