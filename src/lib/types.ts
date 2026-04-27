@@ -37,7 +37,18 @@ export type Order = {
   created_at: string;
 };
 
-export const CATEGORIES = ["Whey Protein", "Creatina", "Pré-Treinos", "Vitaminas"] as const;
+export type Category = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export const DEFAULT_CATEGORIES = ["Whey Protein", "Creatina", "Pré-Treinos", "Vitaminas"] as const;
 
 // Coupon validation is performed server-side in the `checkout` Edge Function.
 // Codes and discount percentages are intentionally NOT shipped to the client.
