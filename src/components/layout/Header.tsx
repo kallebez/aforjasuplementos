@@ -2,7 +2,6 @@ import { Link, NavLink as RouterNavLink, useNavigate } from "react-router-dom";
 import { ShoppingCart, User, LogOut, Search, Shield, Menu, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
-import { useCategories } from "@/hooks/useCategories";
 import { useState } from "react";
 import logo from "@/assets/logo.jpeg";
 
@@ -12,7 +11,6 @@ const Header = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
-  const { categories } = useCategories();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -133,22 +131,19 @@ const Header = () => {
             >
               Ofertas
             </RouterNavLink>
-            {categories.map((category) => (
-              <RouterNavLink
-                key={category.id}
-                to={`/categoria?cat=${encodeURIComponent(category.name)}`}
-                onClick={() => setOpen(false)}
-                className={({ isActive }) =>
-                  `px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                    isActive
-                      ? "gradient-primary text-white shadow-glow"
-                      : "text-white/70 hover:text-white hover:bg-white/5"
-                  }`
-                }
-              >
-                {category.name}
-              </RouterNavLink>
-            ))}
+            <RouterNavLink
+              to="/categoria"
+              onClick={() => setOpen(false)}
+              className={({ isActive }) =>
+                `px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+                  isActive
+                    ? "gradient-primary text-white shadow-glow"
+                    : "text-white/70 hover:text-white hover:bg-white/5"
+                }`
+              }
+            >
+              Produtos
+            </RouterNavLink>
             <RouterNavLink
               to="/combos"
               onClick={() => setOpen(false)}
