@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,6 +23,39 @@ import Unsubscribe from "./pages/Unsubscribe";
 
 const queryClient = new QueryClient();
 
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+};
+
+const AppRoutes = () => (
+  <>
+    <ScrollToTop />
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route path="/categoria" element={<Category />} />
+      <Route path="/produto/:id" element={<ProductPage />} />
+      <Route path="/carrinho" element={<Cart />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/conta" element={<Account />} />
+      <Route path="/combos" element={<Combos />} />
+      <Route path="/blog" element={<Blog />} />
+      <Route path="/unsubscribe" element={<Unsubscribe />} />
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<AdminDashboard />} />
+        <Route path="produtos" element={<AdminProducts />} />
+        <Route path="pedidos" element={<AdminOrders />} />
+      </Route>
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  </>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -30,23 +64,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <CartProvider>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/categoria" element={<Category />} />
-              <Route path="/produto/:id" element={<ProductPage />} />
-              <Route path="/carrinho" element={<Cart />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/conta" element={<Account />} />
-              <Route path="/combos" element={<Combos />} />
-              <Route path="/blog" element={<Blog />} />
-              <Route path="/unsubscribe" element={<Unsubscribe />} />
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<AdminDashboard />} />
-                <Route path="produtos" element={<AdminProducts />} />
-                <Route path="pedidos" element={<AdminOrders />} />
-              </Route>
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <AppRoutes />
           </CartProvider>
         </AuthProvider>
       </BrowserRouter>
