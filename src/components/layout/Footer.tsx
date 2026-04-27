@@ -1,8 +1,11 @@
 import { Link } from "react-router-dom";
 import { Instagram, Facebook, Youtube, Mail, Phone, MapPin } from "lucide-react";
-import { CATEGORIES } from "@/lib/types";
+import { useCategories } from "@/hooks/useCategories";
 
-const Footer = () => (
+const Footer = () => {
+  const { categories } = useCategories();
+
+  return (
   <footer className="bg-secondary text-secondary-foreground mt-20">
     <div className="container py-14 grid md:grid-cols-4 gap-10">
       <div>
@@ -43,10 +46,10 @@ const Footer = () => (
       <div>
         <h4 className="font-semibold mb-4 text-primary-glow">Categorias</h4>
         <ul className="space-y-2 text-sm text-white/70">
-          {CATEGORIES.map((c) => (
-            <li key={c}>
-              <Link to={`/categoria?cat=${encodeURIComponent(c)}`} className="hover:text-white transition-colors">
-                {c}
+          {categories.map((category) => (
+            <li key={category.id}>
+              <Link to={`/categoria?cat=${encodeURIComponent(category.name)}`} className="hover:text-white transition-colors">
+                {category.name}
               </Link>
             </li>
           ))}
@@ -95,6 +98,7 @@ const Footer = () => (
       </div>
     </div>
   </footer>
-);
+  );
+};
 
 export default Footer;

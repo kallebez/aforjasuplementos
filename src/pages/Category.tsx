@@ -2,7 +2,7 @@ import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import ProductCard from "@/components/ProductCard";
 import { useProducts } from "@/hooks/useProducts";
-import { CATEGORIES } from "@/lib/types";
+import { useCategories } from "@/hooks/useCategories";
 import { useNavigate } from "react-router-dom";
 
 const Category = () => {
@@ -11,6 +11,7 @@ const Category = () => {
   const cat = params.get("cat") || undefined;
   const search = params.get("busca") || undefined;
   const { products, loading } = useProducts({ category: cat, search });
+  const { categories } = useCategories();
 
   return (
     <Layout>
@@ -25,13 +26,13 @@ const Category = () => {
           >
             Todos
           </button>
-          {CATEGORIES.map((c) => (
+          {categories.map((category) => (
             <button
-              key={c}
-              onClick={() => navigate(`/categoria?cat=${encodeURIComponent(c)}`)}
-              className={`px-4 h-10 rounded-xl border text-sm font-medium transition-all ${cat === c ? "gradient-primary text-white border-transparent shadow-glow" : "border-border hover:border-primary"}`}
+              key={category.id}
+              onClick={() => navigate(`/categoria?cat=${encodeURIComponent(category.name)}`)}
+              className={`px-4 h-10 rounded-xl border text-sm font-medium transition-all ${cat === category.name ? "gradient-primary text-white border-transparent shadow-glow" : "border-border hover:border-primary"}`}
             >
-              {c}
+              {category.name}
             </button>
           ))}
         </div>

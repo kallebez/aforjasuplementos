@@ -2,11 +2,12 @@ import Layout from "@/components/layout/Layout";
 import ProductCard from "@/components/ProductCard";
 import { useProducts } from "@/hooks/useProducts";
 import { Link } from "react-router-dom";
-import { CATEGORIES } from "@/lib/types";
+import { useCategories } from "@/hooks/useCategories";
 import { ArrowRight, Truck, Shield, Zap, Award, Dumbbell, Flame, Pill, Sparkles } from "lucide-react";
 
 const Index = () => {
   const { products, loading } = useProducts({ activeOnly: true });
+  const { categories } = useCategories();
   const featured = products.slice(0, 8);
   const offers = products.filter((p) => p.old_price).slice(0, 4);
 
@@ -86,12 +87,12 @@ const Index = () => {
           </div>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {CATEGORIES.map((c, i) => {
-            const Icon = categoryIcons[c] || Dumbbell;
+          {categories.map((category, i) => {
+            const Icon = categoryIcons[category.name] || Dumbbell;
             return (
               <Link
-                key={c}
-                to={`/categoria?cat=${encodeURIComponent(c)}`}
+                key={category.id}
+                to={`/categoria?cat=${encodeURIComponent(category.name)}`}
                 className="group relative bg-card border border-border rounded-2xl p-6 hover-lift overflow-hidden animate-fade-in-up"
                 style={{ animationDelay: `${i * 80}ms` }}
               >
@@ -100,7 +101,7 @@ const Index = () => {
                   <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center shadow-glow mb-4 group-hover:scale-110 transition-transform">
                     <Icon className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="font-bold text-lg">{c}</h3>
+                  <h3 className="font-bold text-lg">{category.name}</h3>
                   <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1 group-hover:text-primary transition-colors">
                     Ver todos <ArrowRight className="w-3 h-3" />
                   </p>
