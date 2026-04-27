@@ -22,7 +22,7 @@ const Category = () => {
         <div className="flex flex-wrap gap-2 mb-8">
           <button
             onClick={() => navigate("/categoria")}
-            className={`px-4 h-10 rounded-xl border text-sm font-medium transition-all ${!cat ? "gradient-primary text-white border-transparent shadow-glow" : "border-border hover:border-primary"}`}
+            className={`px-4 h-10 rounded-xl border text-sm font-medium transition-all ${!cat ? "gradient-primary text-white border-transparent shadow-glow" : "border-border hover:bg-muted"}`}
           >
             Todos
           </button>
@@ -30,7 +30,7 @@ const Category = () => {
             <button
               key={category.id}
               onClick={() => navigate(`/categoria?cat=${encodeURIComponent(category.name)}`)}
-              className={`px-4 h-10 rounded-xl border text-sm font-medium transition-all ${cat === category.name ? "gradient-primary text-white border-transparent shadow-glow" : "border-border hover:border-primary"}`}
+              className={`px-4 h-10 rounded-xl border text-sm font-medium transition-all ${cat === category.name ? "gradient-primary text-white border-transparent shadow-glow" : "border-border hover:bg-muted"}`}
             >
               {category.name}
             </button>
