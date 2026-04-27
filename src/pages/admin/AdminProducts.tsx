@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Product } from "@/lib/types";
-import { CATEGORIES, formatBRL } from "@/lib/types";
+import { formatBRL } from "@/lib/types";
+import { useCategories } from "@/hooks/useCategories";
 import { Plus, Edit, Trash2, X, Upload, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -31,6 +32,7 @@ const AdminProducts = () => {
   const [form, setForm] = useState<FormData>(empty);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const { categories } = useCategories();
 
   const load = async () => {
     setLoading(true);
@@ -215,7 +217,7 @@ const AdminProducts = () => {
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium">Categoria *</label>
                   <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full bg-muted border border-border rounded-lg px-3 h-10 text-sm outline-none focus:border-primary">
-                    {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                    {categories.map((category) => <option key={category.id} value={category.name}>{category.name}</option>)}
                   </select>
                 </div>
               </div>
