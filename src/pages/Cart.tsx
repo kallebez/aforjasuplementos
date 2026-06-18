@@ -44,6 +44,31 @@ const Cart = () => {
     toast.success(`Cupom ${trimmed} será validado no checkout`);
   };
 
+  const WHATSAPP_NUMBER = "5516997170629";
+
+  const buildWhatsappMessage = (orderId?: string, totals?: { subtotal: number; discount: number; shipping: number; total: number; couponCode?: string | null }) => {
+    const lines: string[] = [];
+    lines.push("*Novo pedido - A Forja Suplementos*");
+    if (orderId) lines.push(`Pedido: ${orderId}`);
+    if (user?.email) lines.push(`Cliente: ${user.email}`);
+    lines.push("");
+    lines.push("*Itens:*");
+    items.forEach((i) => {
+      lines.push(`• ${i.quantity}x ${i.product.name} — ${formatBRL(i.product.price * i.quantity)}`);
+    });
+    lines.push("");
+    const s = totals?.subtotal ?? subtotal;
+    const d = totals?.discount ?? estimatedDiscount;
+    const sh = totals?.shipping ?? estimatedShipping;
+    const t = totals?.total ?? estimatedTotal;
+    lines.push(`Subtotal: ${formatBRL(s)}`);
+    if (d > 0) lines.push(`Desconto: -${formatBRL(d)}`);
+    lines.push(`Frete: ${sh === 0 ? "Grátis" : formatBRL(sh)}`);
+    if (totals?.couponCode) lines.push(`Cupom: ${totals.couponCode}`);
+    lines.push(`*Total: ${formatBRL(t)}*`);
+    return lines.join("\n");
+  };
+
   const handleCheckout = async () => {
     if (!user) {
       toast.info("Faça login para finalizar a compra");
@@ -61,7 +86,6 @@ const Cart = () => {
 
       const { data, error } = await supabase.functions.invoke("checkout", { body: payload });
       if (error) {
-        // Try to surface server's error message if available
         const msg =
           (data as any)?.error ||
           (error as any)?.context?.error ||
@@ -73,9 +97,19 @@ const Cart = () => {
         throw new Error((data as any)?.error || "Erro ao finalizar a compra");
       }
 
+      const message = buildWhatsappMessage(data.orderId, {
+        subtotal: data.subtotal,
+        discount: data.discount,
+        shipping: data.shipping,
+        total: data.total,
+        couponCode: data.couponCode,
+      });
+      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+
       clear();
       setCouponPreview(null);
-      toast.success("Pedido realizado! Enviamos a confirmação por email.");
+      toast.success("Pedido realizado! Abrindo WhatsApp...");
+      window.open(url, "_blank");
       navigate("/conta");
     } catch (e: any) {
       toast.error(e.message);
