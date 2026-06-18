@@ -44,7 +44,7 @@ const Cart = () => {
     toast.success(`Cupom ${trimmed} será validado no checkout`);
   };
 
-  const WHATSAPP_NUMBER = "5516997170629";
+  const WHATSAPP_NUMBER = "5516997516125";
 
   const buildWhatsappMessage = (orderId?: string, totals?: { subtotal: number; discount: number; shipping: number; total: number; couponCode?: string | null }) => {
     const lines: string[] = [];
