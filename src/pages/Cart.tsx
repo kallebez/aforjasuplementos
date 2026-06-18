@@ -74,6 +74,8 @@ const Cart = () => {
       toast.info("Faça login para finalizar a compra");
       return navigate("/login?redirect=/carrinho");
     }
+    // Abre a aba imediatamente no clique para o navegador não bloquear depois do await.
+    const whatsappWindow = window.open("about:blank", "_blank");
     setLoading(true);
     try {
       const payload = {
@@ -104,15 +106,18 @@ const Cart = () => {
         total: data.total,
         couponCode: data.couponCode,
       });
-      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+      const url = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(message)}`;
 
       clear();
       setCouponPreview(null);
       toast.success("Pedido realizado! Abrindo WhatsApp...");
-      // window.open após await costuma ser bloqueado pelo navegador.
-      // Navegar a aba atual para o wa.me garante a abertura do WhatsApp.
-      window.location.href = url;
+      if (whatsappWindow) {
+        whatsappWindow.location.href = url;
+      } else {
+        window.location.href = url;
+      }
     } catch (e: any) {
+      whatsappWindow?.close();
       toast.error(e.message);
     } finally {
       setLoading(false);
