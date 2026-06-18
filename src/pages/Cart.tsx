@@ -109,8 +109,9 @@ const Cart = () => {
       clear();
       setCouponPreview(null);
       toast.success("Pedido realizado! Abrindo WhatsApp...");
-      window.open(url, "_blank");
-      navigate("/conta");
+      // window.open após await costuma ser bloqueado pelo navegador.
+      // Navegar a aba atual para o wa.me garante a abertura do WhatsApp.
+      window.location.href = url;
     } catch (e: any) {
       toast.error(e.message);
     } finally {
