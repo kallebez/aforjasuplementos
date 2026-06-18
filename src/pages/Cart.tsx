@@ -10,6 +10,14 @@ import { toast } from "sonner";
 
 const SHIPPING_FEE = 19.9;
 const FREE_SHIPPING_THRESHOLD = 199;
+const WHATSAPP_NUMBER = "5516997516125";
+
+const buildWhatsappUrl = (message: string) => {
+  const url = new URL("https://api.whatsapp.com/send");
+  url.searchParams.set("phone", WHATSAPP_NUMBER);
+  url.searchParams.set("text", message);
+  return url.toString();
+};
 
 const Cart = () => {
   const { items, updateQty, removeItem, subtotal, clear } = useCart();
@@ -43,8 +51,6 @@ const Cart = () => {
     setCouponPreview({ code: trimmed, discount: 0, shipping: estimatedShipping, total: estimatedTotal });
     toast.success(`Cupom ${trimmed} será validado no checkout`);
   };
-
-  const WHATSAPP_NUMBER = "5516997516125";
 
   const buildWhatsappMessage = (orderId?: string, totals?: { subtotal: number; discount: number; shipping: number; total: number; couponCode?: string | null }) => {
     const lines: string[] = [];
@@ -106,7 +112,7 @@ const Cart = () => {
         total: data.total,
         couponCode: data.couponCode,
       });
-      const url = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(message)}`;
+      const url = buildWhatsappUrl(message);
 
       clear();
       setCouponPreview(null);
