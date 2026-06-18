@@ -44,7 +44,7 @@ const Cart = () => {
     toast.success(`Cupom ${trimmed} será validado no checkout`);
   };
 
-  const WHATSAPP_NUMBER = "5516997170629";
+  const WHATSAPP_NUMBER = "5516997516125";
 
   const buildWhatsappMessage = (orderId?: string, totals?: { subtotal: number; discount: number; shipping: number; total: number; couponCode?: string | null }) => {
     const lines: string[] = [];
@@ -109,8 +109,9 @@ const Cart = () => {
       clear();
       setCouponPreview(null);
       toast.success("Pedido realizado! Abrindo WhatsApp...");
-      window.open(url, "_blank");
-      navigate("/conta");
+      // window.open após await costuma ser bloqueado pelo navegador.
+      // Navegar a aba atual para o wa.me garante a abertura do WhatsApp.
+      window.location.href = url;
     } catch (e: any) {
       toast.error(e.message);
     } finally {
